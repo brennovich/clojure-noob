@@ -94,3 +94,53 @@
 (sort [3 1 2])
 (sort-by count (map str [4567 "a" "bdc"]))
 
+;; Lazy seq ;;
+
+(def vampire-database
+  {0 {:makes-blood-puns? false, :has-pulse? true  :name "McFishwich"}
+   1 {:makes-blood-puns? false, :has-pulse? true  :name "McMackson"}
+   2 {:makes-blood-puns? true,  :has-pulse? false :name "Damon Salvatore"}
+   3 {:makes-blood-puns? true,  :has-pulse? true  :name "Mickey Mouse"}})
+
+(defn vampire-related-details
+  "simulate database service"
+  [social-security-number]
+  (Thread/sleep 1000)
+  (get vampire-database social-security-number))
+
+(defn vampire?
+  "returns record if it's a vampire"
+  [record]
+  (and (:makes-blood-puns? record)
+       (not (:has-pulse? record))
+       record))
+
+(defn identify-vampire
+  "tests database records againts vampire definition"
+  [social-security-numbers]
+  (first (filter vampire?
+                 (map vampire-related-details social-security-numbers))))
+
+; Using non-lazy secs we'd be forced to wait for entire collection evaluation
+; even if the vampire isn't the last record
+;; (time (identify-vampire [0])) ; it takes ~1 sec
+;; (time (identify-vampire [0 1])) ; it takes ~2 sec
+
+; `range` returns a lazy seq, which means that actual values are realized by
+; the time they are evaluated. Clojure is smart enough to realize that I'm
+; using `first` over a result of a collection `filter` that a `map` is
+; returning lazily, so instead of running all 10000 records it takes small
+; chunks and evaluated them
+;; (time (identify-vampire (range 1 10000))) ; it takes ~32 secs
+
+;; Infinite seqs
+
+(concat (take 8 (repeat "na")) ["Batman!"])
+(take 3 (repeatedly #(rand-int 10)))
+
+(defn even-numbers
+  ([] (even-numbers 0))
+  ([n] (cons n (lazy-seq (even-numbers (+ n 2))))))
+
+(time (take 10 (even-numbers)))
+
