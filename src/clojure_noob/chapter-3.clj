@@ -157,7 +157,8 @@
 
 (defn match-missing-parts
   [part symmetry-factor]
-  (loop [symmetric-parts [{:name (str (:name part) "-" 1) :size (:size part)}]
+  (loop [symmetric-parts [{:name (str (:name part) "-" 1)
+                           :size (:size part)}]
          factor 1]
     (if (= factor symmetry-factor)
       symmetric-parts
@@ -171,3 +172,15 @@
           asym-body-parts))
 
 (symmetrize-body-parts asymmetric-alien-parts 5)
+
+(defn my-loop
+  []
+  (loop [acc 1]
+    (if (= acc 5)
+      (str "Yayyy")
+      (recur (inc acc)))))
+
+(my-loop)
+(conj [2] 3)
+
+(map (fn [[k v]] ({k (* v 2)})) [{:a 1 :b 2}])

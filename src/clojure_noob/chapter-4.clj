@@ -142,5 +142,7 @@
   ([] (even-numbers 0))
   ([n] (cons n (lazy-seq (even-numbers (+ n 2))))))
 
-(time (take 10 (even-numbers)))
+(time (take 100 (even-numbers)))
+
+(def result (+ 2 2 (* 3 3)))
 
